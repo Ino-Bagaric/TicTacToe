@@ -9,6 +9,8 @@ const WON_STATUS_NONE  = false;
 const WON_STATUS_X     = 'X';
 const WON_STATUS_O     = 'O';
 const WON_STATUS_DRAWN = 'DRAWN';
+const X_COLOR          = '#e74c3c';
+const O_COLOR          = '#3498db';
 
 // Bit masks
 const emptyMask = 0b00000000;
@@ -83,6 +85,7 @@ var player2Mask = emptyMask;
 // board info
 var xScore = 0;
 var oScore = 0;
+var drawnGames = 0;
 var resetTimes = 0;
 
 
@@ -114,6 +117,7 @@ function registerField(button, playerid, fieldid) {
 
 	button.innerHTML = whosTurn();
 	button.style.backgroundColor = "#1a222a";
+	button.style.color = getPlayerColor();
 
 	usedFields |= (1 << fieldid);
 
@@ -131,6 +135,7 @@ function registerField(button, playerid, fieldid) {
 				break;
 
 			case WON_STATUS_DRAWN:
+				drawnGames++;
 				showFinishDialog('Drawn game :(');
 				break;
 		}
@@ -161,6 +166,10 @@ function checkWin(playerid) {
 	return false;
 }
 
+function getPlayerColor() {
+	return (whosTurn() == 'X') ? X_COLOR : O_COLOR;
+}
+
 function blockGame() {
 	usedFields = fullMask;
 }
@@ -174,16 +183,17 @@ function resetGame() {
 	// GUI reset
 	for (var i = 0; i < fields.length; i++) {
 		fields[i].innerHTML = '';
-		fields[i].style.backgroundColor = "";
+		fields[i].style.backgroundColor = '';
 	}
 
 	updateBoardInfo();
 }
 
 function updateBoardInfo() {
-	infoBoard.innerHTML = whosTurn() + '`s turn!<br> <br> <br>'
+	infoBoard.innerHTML = '<b><span style="color:' + getPlayerColor() + '">' + whosTurn() + '</span></b>`s turn!<br> <br> <br>'
 						+ 'X Score: ' + xScore + '<br>'
 						+ 'O Score: ' + oScore + '<br>'
+						+ 'Drawn Games: ' + drawnGames + '<br>'
 						+ 'Reset Times: ' + resetTimes;
 }
 
@@ -203,6 +213,7 @@ function initGame() {
 	resetButtonScore.addEventListener('click', function() {
 		xScore = 0;
 		oScore = 0;
+		drawnGames = 0;
 
 		updateBoardInfo();
 		//resetGame();
